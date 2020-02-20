@@ -14,6 +14,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
 
+import 'react-dates/initialize';
+import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'react-dates';
+import 'react-dates/lib/css/_datepicker.css';
+
+import moment from 'moment';
+
 function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
@@ -63,6 +69,9 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 export default function Album() {
   const classes = useStyles();
+  const [startDate, setStartDate] = React.useState(moment());
+  const [endDate, setEndDate] = React.useState(moment());
+  const [focusedInput, setFocusedInput] = React.useState(null);
 
   return (
     <React.Fragment>
@@ -93,6 +102,17 @@ export default function Album() {
                   <Button variant="contained" color="primary">
                     Main call to action
                   </Button>
+                </Grid>
+                <Grid item>
+                  <DateRangePicker
+                    startDate={startDate} // momentPropTypes.momentObj or null,
+                    startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
+                    endDate={endDate} // momentPropTypes.momentObj or null,
+                    endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
+                    onDatesChange={({ startDate, endDate }) => {setStartDate(startDate); setEndDate(endDate);}} // PropTypes.func.isRequired,
+                    focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                    onFocusChange={focusedInput =>setFocusedInput(focusedInput)} // PropTypes.func.isRequired,
+                  />
                 </Grid>
                 <Grid item>
                   <Button variant="outlined" color="primary">
