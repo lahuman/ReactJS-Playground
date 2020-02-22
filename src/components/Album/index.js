@@ -13,11 +13,13 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import Row from '../Row';
+import Datepicker from '../Datepicker';
 
 import 'react-dates/initialize';
 import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
-
+import 'moment/locale/ko';
 import moment from 'moment';
 
 function Copyright() {
@@ -67,11 +69,44 @@ const useStyles = makeStyles(theme => ({
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+
+let getDateRangeFromCriteria = crit => {
+  let currentMoment = moment();
+  if (crit === 'today') {
+    return [currentMoment.clone(), currentMoment.clone()];
+  }
+  if (crit === 'everyday') {
+    return [currentMoment.clone().subtract(1, 'month'), currentMoment.clone().subtract(1, 'day')];
+  }
+  if (crit === '7days') {
+    return [currentMoment.clone().subtract(6, 'day'), currentMoment.clone()];
+  }
+  return [null, null];
+};
+
 export default function Album() {
   const classes = useStyles();
   const [startDate, setStartDate] = React.useState(moment());
   const [endDate, setEndDate] = React.useState(moment());
   const [focusedInput, setFocusedInput] = React.useState(null);
+  const [criteria, setCriteria] = React.useState('7days');
+
+  const mmToString = mmDate => mmDate ? mmDate.format('YYYYMMDD') : '';
+  const [dateRange, setDateRange] = React.useState(() => getDateRangeFromCriteria(criteria));
+  const DatepickerPopperRef = React.useRef();
+  const [minDate, maxDate] = React.useMemo(() => {
+    let toStr = d => d.format('YYYY/MM/DD');
+    if (criteria === 'today') {
+      return [toStr(moment()), toStr(moment())];
+    }
+    if (criteria === 'everyday') {
+      return [null, toStr(moment().subtract(1, 'day'))];
+    }
+    if (criteria === '7days') {
+      return [null, toStr(moment())];
+    }
+    return [];
+  }, [criteria]);
 
   return (
     <React.Fragment>
@@ -98,21 +133,35 @@ export default function Album() {
             </Typography>
             <div className={classes.heroButtons}>
               <Grid container spacing={2} justify="center">
-                <Grid item>
-                  <Button variant="contained" color="primary">
-                    Main call to action
-                  </Button>
-                </Grid>
-                <Grid item>
+                <Row title="기본 react-dates">
                   <DateRangePicker
                     startDate={startDate} // momentPropTypes.momentObj or null,
                     startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
                     endDate={endDate} // momentPropTypes.momentObj or null,
                     endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
-                    onDatesChange={({ startDate, endDate }) => {setStartDate(startDate); setEndDate(endDate);}} // PropTypes.func.isRequired,
+                    onDatesChange={({ startDate, endDate }) => { setStartDate(startDate); setEndDate(endDate); }} // PropTypes.func.isRequired,
                     focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
-                    onFocusChange={focusedInput =>setFocusedInput(focusedInput)} // PropTypes.func.isRequired,
+                    onFocusChange={focusedInput => setFocusedInput(focusedInput)} // PropTypes.func.isRequired,
+                    startDateOffset={undefined}
+                    endDateOffset={undefined}
                   />
+                </Row>
+                <Row title="조금 변경한버젼">
+                  <Datepicker
+                    popperRef={DatepickerPopperRef}
+                    dateRange={dateRange}
+                    onChange={setDateRange}
+                    minDate={minDate}
+                    maxDate={maxDate}
+                    maxRange={7}
+                  />
+                  <input type="hidden" name="startDate" value={mmToString(startDate)} />
+                  <input type="hidden" name="endDate" value={mmToString(endDate)} />
+                </Row>
+                <Grid item>
+                  <Button variant="contained" color="primary">
+                    Main call to action
+                  </Button>
                 </Grid>
                 <Grid item>
                   <Button variant="outlined" color="primary">
