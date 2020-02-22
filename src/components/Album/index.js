@@ -13,7 +13,6 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
-import Row from '../Row';
 import Datepicker from '../Datepicker';
 
 import 'react-dates/initialize';
@@ -133,7 +132,7 @@ export default function Album() {
             </Typography>
             <div className={classes.heroButtons}>
               <Grid container spacing={2} justify="center">
-                <Row title="기본 react-dates">
+              <Grid item>
                   <DateRangePicker
                     startDate={startDate} // momentPropTypes.momentObj or null,
                     startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
@@ -142,11 +141,10 @@ export default function Album() {
                     onDatesChange={({ startDate, endDate }) => { setStartDate(startDate); setEndDate(endDate); }} // PropTypes.func.isRequired,
                     focusedInput={focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
                     onFocusChange={focusedInput => setFocusedInput(focusedInput)} // PropTypes.func.isRequired,
-                    startDateOffset={undefined}
-                    endDateOffset={undefined}
+                    isOutsideRange={r=>false}
                   />
-                </Row>
-                <Row title="조금 변경한버젼">
+                </Grid>
+                <Grid item>
                   <Datepicker
                     popperRef={DatepickerPopperRef}
                     dateRange={dateRange}
@@ -157,7 +155,7 @@ export default function Album() {
                   />
                   <input type="hidden" name="startDate" value={mmToString(startDate)} />
                   <input type="hidden" name="endDate" value={mmToString(endDate)} />
-                </Row>
+                </Grid>
                 <Grid item>
                   <Button variant="contained" color="primary">
                     Main call to action
